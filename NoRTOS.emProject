@@ -140,5 +140,8 @@
         <configuration Name="Common" file_type="Assembly" />
       </file>
     </folder>
+    <configuration
+      Name="Debug"
+      c_preprocessor_definitions="NRF_TRUSTZONE_NONSECURE" />
   </project>
 </solution>
