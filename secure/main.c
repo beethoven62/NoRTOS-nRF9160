@@ -32,6 +32,10 @@ typedef void ( *NonSecureResetHandler_t )( void ) __attribute__( ( cmse_nonsecur
 
 /* Configure non-secure regions. */
 void ConfigNonSecure( void );
+void nrf_spu_flashregion_set(uint16_t region, uint32_t flags);
+void nrf_spu_flashregion_clear(uint16_t region, uint32_t flags);
+void nrf_spu_ramregion_set(uint16_t region, uint32_t flags);
+void nrf_spu_ramregion_clear(uint16_t region, uint32_t flags);
 
 /* Boot into the non-secure code. */
 void BootNonSecure( uint32_t ulNonSecureStartAddress );
@@ -80,9 +84,29 @@ void ConfigNonSecure( void )
 
   for ( i = 16; i < 32; i++ )
   {
-    NRF_SPU_S->FLASHREGION[i].PERM &= ~(1 << SPU_FLASHREGION_PERM_SECATTR_Pos);
-    NRF_SPU_S->RAMREGION[i].PERM &= ~(1 << SPU_RAMREGION_PERM_SECATTR_Pos);
+    nrf_spu_flashregion_clear(i, SPU_FLASHREGION_PERM_SECATTR_Msk);
+    nrf_spu_ramregion_clear(i, SPU_RAMREGION_PERM_SECATTR_Msk);
   }
+}
+
+void nrf_spu_flashregion_set(uint16_t region, uint32_t flags)
+{
+  NRF_SPU_S->FLASHREGION[region].PERM |= flags;
+}
+
+void nrf_spu_flashregion_clear(uint16_t region, uint32_t flags)
+{
+  NRF_SPU_S->FLASHREGION[region].PERM &= ~flags;
+}
+
+void nrf_spu_ramregion_set(uint16_t region, uint32_t flags)
+{
+  NRF_SPU_S->RAMREGION[region].PERM |= flags;
+}
+
+void nrf_spu_ramregion_clear(uint16_t region, uint32_t flags)
+{
+  NRF_SPU_S->RAMREGION[region].PERM &= ~flags;
 }
 
 /*************************** End of file ****************************/
