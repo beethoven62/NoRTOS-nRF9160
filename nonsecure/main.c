@@ -20,6 +20,7 @@ void nrf_spu_periph_set(uint16_t id, uint32_t flags);
 void nrf_spu_periph_clear(uint16_t id, uint32_t flags);
 void nrf_spu_gpio_set(uint16_t id);
 void nrf_spu_gpio_clear(uint16_t id);
+
 void nrf_gpio_dir_set(uint16_t pin);
 void nrf_gpio_dir_clear(uint16_t pin);
 void nrf_gpio_out_set(uint16_t pin);
@@ -36,12 +37,8 @@ void nrf_gpio_toggle(uint16_t pin);
 int main(void) {
   int i, j;
 
-  i = (( uint32_t )NRF_P0_NS >> 12) & 0x7f;
-  nrf_spu_periph_clear(i, SPU_PERIPHID_PERM_SECATTR_Msk);
-
   for ( i = 2; i < 10; i++ )
   {
-    nrf_spu_gpio_clear(i);
     nrf_gpio_dir_set(i);
   }
 
@@ -56,26 +53,6 @@ int main(void) {
     nrf_gpio_toggle( j + 2 );
     j = ( j + 1 ) % 4;
   } while (1);
-}
-
-void nrf_spu_gpio_set(uint16_t id)
-{
-  NRF_SPU_S->GPIOPORT[0].PERM |= (1 << id);
-}
-
-void nrf_spu_gpio_clear(uint16_t id)
-{
-  NRF_SPU_S->GPIOPORT[0].PERM &= ~(1 << id);
-}
-
-void nrf_spu_periph_set(uint16_t id, uint32_t flags)
-{
-  NRF_SPU_S->PERIPHID[id].PERM |= flags;
-}
-
-void nrf_spu_periph_clear(uint16_t id, uint32_t flags)
-{
-  NRF_SPU_S->PERIPHID[id].PERM &= ~flags;
 }
 
 void nrf_gpio_dir_set(uint16_t pin)

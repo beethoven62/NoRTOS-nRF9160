@@ -142,6 +142,6 @@
     </folder>
     <configuration
       Name="Debug"
-      c_preprocessor_definitions="NRF_TRUSTZONE_NONSECURE" />
+      c_preprocessor_definitions="NRF_TRUSTZONE_NONSECURE;__SUPPORT_RESET_HALT_AFTER_BTL = 0" />
   </project>
 </solution>
