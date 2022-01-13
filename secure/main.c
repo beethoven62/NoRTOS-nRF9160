@@ -15,16 +15,13 @@ Purpose : Generic application start
 #include <arm_cmse.h>
 #include <nrf.h>
 
-
-#if ( __ARM_FEATURE_CMSE & 1 ) == 0
-	#error "Need ARMv8-M security extensions"
-#elif ( __ARM_FEATURE_CMSE & 2 ) == 0
-	#error "Compile with -mcmse"
-#endif
-
-
 /* Start address of non-secure application. */
-#define mainNONSECURE_APP_START_ADDRESS		( 0x80000U )
+#define mainNONSECURE_APP_START_ADDRESS		( 0x00010000U )
+#define mainNONSECURE_RAM_START_ADDRESS         ( 0x20008000U )
+#define RAM_ADDRESS_MASK                        ( 0x0fffffffU )
+#define SPU_FLASHREGION_SIZE                    ( 0x8000U )
+#define SPU_RAMREGION_SIZE                      ( 0x2000U )
+#define SPU_NUM_REGIONS                         ( 0x20U )
 
 /* typedef for non-secure Reset Handler. */
 typedef void ( *NonSecureResetHandler_t )( void ) __attribute__( ( cmse_nonsecure_call ) );
@@ -84,23 +81,25 @@ void BootNonSecure( uint32_t ulNonSecureStartAddress )
 
 void ConfigNonSecure( void )
 {
-  uint16_t i;
+  uint16_t rgn;
 
-  for ( i = 16; i < 32; i++ )
+  for ( rgn = mainNONSECURE_APP_START_ADDRESS / SPU_FLASHREGION_SIZE; rgn < SPU_NUM_REGIONS; rgn++ )
   {
-    nrf_spu_flashregion_clear(i, SPU_FLASHREGION_PERM_SECATTR_Msk);
-    nrf_spu_ramregion_clear(i, SPU_RAMREGION_PERM_SECATTR_Msk);
+    nrf_spu_flashregion_clear(rgn, SPU_FLASHREGION_PERM_SECATTR_Msk);
+   }
+  for ( rgn = ( mainNONSECURE_RAM_START_ADDRESS & RAM_ADDRESS_MASK ) / SPU_RAMREGION_SIZE; rgn < SPU_NUM_REGIONS; rgn++ )
+  {
+    nrf_spu_ramregion_clear(rgn, SPU_RAMREGION_PERM_SECATTR_Msk);
   }
 
-  i = (( uint32_t )NRF_P0_NS >> 12) & 0x7f;
-  nrf_spu_periph_clear(i, SPU_PERIPHID_PERM_SECATTR_Msk);
+  rgn = (( uint32_t )NRF_P0_NS >> 12) & 0x7f;
+  nrf_spu_periph_clear(rgn, SPU_PERIPHID_PERM_SECATTR_Msk);
 
-  for ( i = 2; i < 10; i++ )
+  for ( rgn = 2; rgn < 10; rgn++ )
   {
-    nrf_spu_gpio_clear(i);
+    nrf_spu_gpio_clear(rgn);
   }
 }
-
 
 void nrf_spu_flashregion_set(uint16_t region, uint32_t flags)
 {
