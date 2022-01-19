@@ -14,6 +14,8 @@ Purpose : Generic application start
 #include <stdlib.h>
 #include <nrf.h>
 
+#include "NSCFunctions.h"
+
 /* Configure non-secure peripherals. */
 
 void nrf_spu_periph_set(uint16_t id, uint32_t flags);
@@ -26,6 +28,9 @@ void nrf_gpio_dir_clear(uint16_t pin);
 void nrf_gpio_out_set(uint16_t pin);
 void nrf_gpio_out_clear(uint16_t pin);
 void nrf_gpio_toggle(uint16_t pin);
+
+/* Non-secure callable function */
+extern uint32_t pxNSCFunctionHandler( uint32_t value );
 
 /*********************************************************************
 *
@@ -41,6 +46,9 @@ int main(void) {
   {
     nrf_gpio_dir_set(i);
   }
+
+  printf("NSC function 1 call result: %d\n", entry1(2));
+  printf("NSC function 2 call result: %d\n", entry2(2));
 
   j = 0;
 
